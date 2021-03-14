@@ -1,10 +1,8 @@
-from tensorflow.keras.layers import *
-import numpy as np
-import tensorflow as tf
+import tensorflow
 import warnings
 
-class ResidualConvBlock(tf.keras.Sequential):
-    def __init__(self, kernel_shapes, filters, strides=(1,1), padding="same", activation=tf.keras.layers.Activation('linear'), norm=tf.keras.layers.BatchNormalization):
+class ResidualConvBlock(tensorflow.keras.Sequential):
+    def __init__(self, kernel_shapes, filters, strides=(1,1), padding="same", activation=tensorflow.keras.layers.Activation('linear'), norm=tensorflow.keras.layers.BatchNormalization):
         super(ResidualConvBlock, self).__init__(name='')
 
         self.kernel_shapes = kernel_shapes
@@ -28,7 +26,6 @@ class ResidualConvBlock(tf.keras.Sequential):
 
         self._layers = []
         for i in range(len(self.kernel_shapes)):
-            self._layers.append(tf.keras.layers.Conv2D(self.filters[i], self.kernel_shapes[i], strides=self.strides, padding=self.padding, activation=self.activation))
             if self.norm != None:
                 self._layers.append(self.norm())
                 self.norm_adapter = 2
@@ -42,17 +39,8 @@ class ResidualConvBlock(tf.keras.Sequential):
             layer = self._layers[layer_ind]
             out = layer(out)
             outs.append(out)
-            """
-            if (layer_ind+1)%int(len(self.filters)*self.norm_adapter) == 0 and layer_ind != 0:
-                print("h"*50)
-                print(layer_ind+1-int(len(self.filters)*self.norm_adapter))
-                old_out = outs[layer_ind+1-int(len(self.filters)*self.norm_adapter)]
-                out = Concatenate()([out, old_out])
-            """
+
             if (layer_ind+1)==len(self.filters)*self.norm_adapter:
                 old_out = outs[layer_ind+1-int(len(self.filters)*self.norm_adapter)]
-                out = tf.keras.layers.Concatenate()([out, old_out])
+                out = tensorflow.keras.layers.Concatenate()([out, old_out])
         return out
-l = ResidualConvBlock((3, 3, 3), (128, 256, 512), padding="valid")
-_=l(tf.zeros([2,5,5,3]))
-l.summary()
