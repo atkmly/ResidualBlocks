@@ -26,6 +26,7 @@ class ResidualConvBlock(tensorflow.keras.Sequential):
 
         self._layers = []
         for i in range(len(self.kernel_shapes)):
+            self._layers.append(tf.keras.layers.Conv2D(self.filters[i], self.kernel_shapes[i], strides=self.strides, padding=self.padding, activation=self.activation))
             if self.norm != None:
                 self._layers.append(self.norm())
                 self.norm_adapter = 2
