@@ -2,31 +2,18 @@ import tensorflow
 import warnings
 
 class ResidualConvBlock(tensorflow.keras.Sequential):
-    def __init__(self, kernel_shapes, filters, strides=(1,1), padding="same", activation=tensorflow.keras.layers.Activation('linear'), norm=tensorflow.keras.layers.BatchNormalization):
+    def __init__(self,layers, activation=tensorflow.keras.layers.Activation('linear'), norm=tensorflow.keras.layers.BatchNormalization):
         super(ResidualConvBlock, self).__init__(name='')
 
-        self.kernel_shapes = kernel_shapes
-        self.filters = filters
-        self.strides = strides
-        self.padding = padding
+        self.layers = layers
         self.activation = activation
         self.norm = norm
         
         self.norm_adapter = 1 
 
-        if type(self.filters) is int or len(self.filters) == 1:
-            self.filters = int(self.filters)
-            self.filters = (self.filters, self.filters, self.filters)
-            warnings.warn("'filters' argument should be tuple with >1 variable but you entered variable or 1 length tuple it\n converted to tuple with length 3",
-                        RuntimeWarning)
-        if (not self.filters[0] == self.filters[-1] == self.filters[-2] or not self.kernel_shapes[0] == self.kernel_shapes[-1] == self.kernel_shapes[-2]) and self.padding == "valid":
-            self.padding = "same"
-            warnings.warn("if your first and last 2 convolution have different number of filters or diferent filter shapes you\n must use 'same' for padding but you used 'valid' because of this it converted to same",
-                        RuntimeWarning)
-
         self._layers = []
-        for i in range(len(self.kernel_shapes)):
-            self._layers.append(tensorflow.keras.layers.Dense()
+        for i in range(len(self.layers)):
+            self._layers.append(tensorflow.keras.layers.Dense(self.layers[i]))
             if self.norm != None:
                 self._layers.append(self.norm())
                 self.norm_adapter = 2
